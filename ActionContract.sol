@@ -32,6 +32,7 @@ contract ActionContract {
         string func; // uri of the function to call
         string[] params; // the parameter with which to call the
         string auth; // uri of the authorization info
+        address holder; // the address of the agent holding the corresponding token
     }
 
     /**
@@ -75,7 +76,8 @@ contract ActionContract {
             id: actionId,
             func: actionUri,
             params: params,
-            auth: authUri
+            auth: authUri,
+            holder: msg.sender
         });
         notary.askOk(actionUri, authUri, token);
         emit Request(msg.sender, token);
@@ -84,7 +86,8 @@ contract ActionContract {
 
     //pattern related
     function redeemActionToken(bytes32 token) external {
-        require(notary.isOK(token), "Token not ok.");
+        require(msg.sender == actions[token].holder, "Sender not authorized.");
+        require(notary.isOK(token), "Token not approved.");
         if (
             keccak256(abi.encodePacked(actions[token].func)) ==
             keccak256(abi.encodePacked(uri, "store")) // e.g. i.e. // e.g. http://example.org/ActionContract#store
