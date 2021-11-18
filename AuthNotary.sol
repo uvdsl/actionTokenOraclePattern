@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.10;
 
-contract AuthOracle {
-    // Authentication and Authorization Oracle
+contract AuthNotary {
+    // Authentication and Authorization Notary for interaction with off-chain Oracles
 
     event AuthRequest(string actionUri, string authUri, bytes32 token);
     event AuthResponse(bytes32 token, bool ok);

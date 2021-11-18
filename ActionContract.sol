@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.10;
 
-// interface of Auth Oracle
-contract AuthOracle {
+// interface of Auth Notary
+contract AuthNotary {
     event AuthRequest(string actionUri, string authUri, bytes32 token);
     event AuthResponse(bytes32 token, bool ok);
 
@@ -44,7 +44,7 @@ contract ActionContract {
      * props
      */
     // contract related
-    AuthOracle oracle;
+    AuthNotary public notary;
     string public uri; // e.g. http://example.org/ActionContract#
     // pattern related
     mapping(bytes32 => Action) public actions;
@@ -55,9 +55,9 @@ contract ActionContract {
     /**
      * constructor
      */
-    constructor(string memory contractUri, address oracleAddress) {
+    constructor(string memory contractUri, address notaryAddress) {
         uri = contractUri; // the URI to identify the contract on the web, dereferencing yields more information
-        oracle = AuthOracle(oracleAddress); // the oracle used in this contract
+        notary = AuthNotary(notaryAddress); // the notary used in this contract
     }
 
     /**
@@ -77,14 +77,14 @@ contract ActionContract {
             params: params,
             auth: authUri
         });
-        oracle.askOk(actionUri, authUri, token);
+        notary.askOk(actionUri, authUri, token);
         emit Request(msg.sender, token);
         return token;
     }
 
     //pattern related
     function redeemActionToken(bytes32 token) external {
-        require(oracle.isOK(token), "Token not ok.");
+        require(notary.isOK(token), "Token not ok.");
         if (
             keccak256(abi.encodePacked(actions[token].func)) ==
             keccak256(abi.encodePacked(uri, "store")) // e.g. i.e. // e.g. http://example.org/ActionContract#store
@@ -94,7 +94,7 @@ contract ActionContract {
         }
         // else if other funcs ...
         else {
-            revert("How did you trick the oracle...?");
+            revert("How did you trick the notary and its oracles...?");
             // this should not happen as oracles should check applicability of function URIs.
         }
     }

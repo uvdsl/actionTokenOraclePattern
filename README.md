@@ -39,12 +39,12 @@ In our setup, it can dereference the URI submitted upon function invocation to r
 After verification, the oracle responds to the Smart Contract with the result, thereby allowing the desired action to be executed.
 (Of course, you can modify the setup of the oracle(s) and their reputation, voting, etc. as needed for your use-case.)
 
-_Note:_ The `AuthOracle.sol` is not an Oracle. It is a Smart Contract to interact with Oracles which live off-chain.
+_Note:_ The `AuthNotary.sol` is not an Oracle. It is a Smart Contract to interact with Oracles which live off-chain.
 
 The Action Token Oracle Pattern has four components:
 - the __Agent__ that wants to execute a Smart Contract function.
 - the __ActionContract__, i.e. the Smart Contract where the function is implemented.
-- the __AuthOracle__ contract, i.e. the Smart Contract that interacts with Oracles.
+- the __AuthNotary__ contract, i.e. the Smart Contract that interacts with Oracles.
 - the __Oracle(s)__ that verify authorization, i.e. credentials, off-chain.
 
 The basic idea of this pattern is the following, illustrated in Figure 1:
@@ -57,16 +57,16 @@ Such secured functions are internal, i.e. they can be only invoked by the Smart 
 To execute such function, the __agent__ needs to request an `action token` from the __ActionContract__ by submitting the `action` (in our case identified using a URI), the `parameter` and the `authorization` info (in our case the vc identified using a URI).
 
 The Action contract registers the action and its parameters and provides a token that is associated to that particular desired action, i.e. action + parameters.
-This token is then passed back to the __agent__, and, more importantly, passed to the __AuthOracle__ contract for verification.
+This token is then passed back to the __agent__, and, more importantly, passed to the __AuthNotary__ contract for verification.
 
-The __AuthOracle__ emits an event asking the off-chain __Oracle(s)__ to verifiy that the agent is in-fact authorized to execute the desired action.
+The __AuthNotary__ emits an event asking the off-chain __Oracle(s)__ to verifiy that the agent is in-fact authorized to execute the desired action.
 
 The __Oracle(s)__ receive and dereference the credential URI.
-The validity of the credential is verified and the approval of the token is responded back to the __AuthOracle__ contract which emits a corresponding event.
+The validity of the credential is verified and the approval of the token is responded back to the __AuthNotary__ contract which emits a corresponding event.
 The __agent__ is notified by this event that the token is ready for redemtion (if the verification was successfull).
 
 Now, the __agent__ can simply redeem the `action token` at the __ActionContract__.
-Of course, the __ActionContract__ checks back with the __AuthOracle__ contract if the token has really been approved by the __Oracle(s)__.
+Of course, the __ActionContract__ checks back with the __AuthNotary__ contract if the token has really been approved by the __Oracle(s)__.
 If so, proceed.
 Since the __ActionContract__ has pre-registered all necessary information, the token suffices to execute the desired action with the pre-defined parameters.
 
